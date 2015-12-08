@@ -46,7 +46,7 @@
                   break;
               }
 
-              var partials = element.split(',');
+              var partials = element.split(';');
 
               if (partials.length > 1) {
                 var current = _instance.tags;
@@ -105,6 +105,8 @@
       destroy: function() {
         var id = $(this).attr('data-uniqid');
         delete window.inputTags.instances[id];
+        $('.inputTags-' + id).val('').removeClass('inputTags-' + id)
+        $('.inputTags-list[data-uniqid=' + id + ']').remove()
       }
     };
 
@@ -131,7 +133,7 @@
 
         /* Variables */
         self.options = options;
-        self.keys = [13, 188, 27];
+        self.keys = [13, /*188, */27];
         self.tags = [];
 
         if (self.options.keys.length > 0) {
@@ -158,7 +160,7 @@
         * COnstruit le squelette HTML du plugin
         */
         self.build = function() {
-          self.$html = $('<div>').addClass(self.LIST_CLASS);
+          self.$html = $('<div>').attr({class: self.LIST_CLASS, 'data-uniqid': self.UNIQID});
           self.$input = $('<input>').attr({
             'type': 'text',
             'class': self.FIELD_CLASS
@@ -185,7 +187,6 @@
           if (0 === self.options.tags) {
             return false;
           }
-
           self._concatenate();
           self._updateValue();
 
@@ -231,7 +232,7 @@
               return false;
             }
 
-            value = 188 === key ? value.slice(0, -1) : value;
+            //value = 188 === key ? value.slice(0, -1) : value;
 
             if (!self._validate(value, true)) {
               return false;
@@ -301,7 +302,7 @@
             var $item = $(this).addClass('is-edit');
             var value = $('.value', $item).text();
 
-            self.$input.width($item.outerWidth()).insertAfter($item).addClass('is-edit').attr('data-old-value', value).val(value).focus();
+            self.$input.width($item.width()).insertAfter($item).addClass('is-edit').attr('data-old-value', value).val(value).focus();
 
             self._bindEvent('selected');
 
@@ -372,7 +373,7 @@
 
         self._getDefaultValues = function() {
           if (self.$element.val().length > 0) {
-            self.tags = self.tags.concat(self.$element.val().split(','));
+            self.tags = self.tags.concat(self.$element.val().split(';'));
           } else {
             self.$element.attr('value', '');
           }
@@ -509,7 +510,7 @@
 		* Met à jour l'attribut value de l'input sur lequel est bindé le plugin
         */
         self._updateValue = function() {
-          self.$element.attr('value', self.tags.join(','));
+          self.$element.attr('value', self.tags.join(';'));
         };
         
         /*
@@ -710,7 +711,7 @@
       var id = $(this).attr('data-uniqid');
       var _instance = window.inputTags.instances[id];
 
-      if ('indefined' === typeof _instance) {
+      if ('undefined' === typeof _instance) {
         return $.error("[undefined instance] No inputTags instance found.");
       }
 
